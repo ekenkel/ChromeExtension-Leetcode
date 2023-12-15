@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "author": {
+    "email": "ekenkel7@gmail.com"
+  },
+  "name": "Leetcode Extra Information Remover",
+  "version": "1.0",
+  "description": "Remove the difficulty tag and other information before the page loads.",
+  "permissions": ["webRequest","storage", "tabs"],
+  "host_permissions": [
+    "https://leetcode.com/problems/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "images/icon-16.png",
+      "48": "images/icon-48.png",
+      "128": "images/icon-128.png"
+    },
+    "default_title": "Leetcode Extra Information Remover"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/problems/*"],
+      "js": ["scripts/content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "16": "images/icon-16.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  }
+}
+  
