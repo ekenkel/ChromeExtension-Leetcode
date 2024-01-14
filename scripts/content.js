@@ -1,4 +1,14 @@
-const DEL_SELECTOR = '.mt-3.flex.items-center.space-x-4';
+const panelSelector = 'div > div.flex.w-full.flex-1.flex-col.gap-4.overflow-y-auto.px-4.py-5';
+
+const content_selectors = [
+  'div > div.flex.w-full.flex-1.flex-col.gap-4.overflow-y-auto.px-4.py-5 > div.flex.items-start.justify-between.gap-4', // Title and Solved
+  'div > div.flex.w-full.flex-1.flex-col.gap-4.overflow-y-auto.px-4.py-5 > div.flex.gap-1', // Difficulty
+  'div > div.flex-none', // Public likes, dislikes, comments
+  'div > div.flex.w-full.flex-1.flex-col.gap-4.overflow-y-auto.px-4.py-5 > div.mt-6.flex.flex-col.gap-3 > div.flex.flex-wrap.items-center', // Accepted, Submissions, Acceptance Rate
+];
+
+const elements = [];
+
 let displayState = false;
 const returnButton = document.createElement('button');
 returnButton.textContent = 'Show Problem Details';
@@ -15,16 +25,17 @@ function onMutation(mutations) {
   for (const {addedNodes} of mutations) {
     for (const n of addedNodes) {
       if (n.tagName) {
-        if (n.matches(DEL_SELECTOR)) {
-          stopped = true;
-          mo.disconnect();
-          n.remove();
-        } else if (n.firstElementChild && n.querySelector(DEL_SELECTOR)) {
+        const panelSection = n.querySelector(panelSelector)
+        if (panelSection) {
+          // Then we know the panel now exists and we can look for the other items
           stopped = true
           mo.disconnect();
-          const el = n.querySelector(DEL_SELECTOR)
-          toggle(el);
-          el.appendChild(returnButton);
+          for (const selector of content_selectors) {
+            const el = n.querySelector(selector)
+            elements.push(el)
+            toggleDisplayMode(el);
+          }
+          panelSection.insertBefore(returnButton, panelSection.querySelector('div > div.flex.w-full.flex-1.flex-col.gap-4.overflow-y-auto.px-4.py-5 > div.elfjS'))
         }
       }
     }
@@ -39,19 +50,16 @@ function eventToggler() {
   } else {
     returnButton.textContent = 'Show Problem Details';
   }
-  toggle(document.querySelector(DEL_SELECTOR))
+  toggleDisplayMode()
 }
 
-function toggle(parent) {
-  for (const child of parent.children) {
-    if (child.id !== 'CustomToggleBtn') {
-      if (displayState) {
-        child.style.display = '';
-      } else {
-        child.style.display = 'none';
-      }
+function toggleDisplayMode() {
+  for (const el of elements) {
+    if (displayState) {
+      el.style.display = '';
+    } else {
+      el.style.display = 'none';
     }
-    
   }
 }
 
@@ -64,12 +72,3 @@ function observe() {
     childList: true,
   });
 }
-
-// Set an interval to check for changes and clear the timeout if any changes are found
-const checkForChangesInterval = setInterval(() => {
-  const el = document.querySelector(DEL_SELECTOR + " > div.flex.rounded");
-  if (el) {
-    clearInterval(checkForChangesInterval); // Clear the interval
-    el.style.display = 'none';
-  }
-}, 100); // Check every 0.1 seconds for the "Problem completed" to appear
